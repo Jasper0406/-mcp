@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小智AI音乐服务测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .section h2 {
+            color: #444;
+            margin-top: 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px 5px 5px 0;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input {
+            padding: 8px;
+            margin: 5px 0;
+            width: 300px;
+        }
+        #response {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>小智AI音乐服务测试</h1>
+        
+        <div class="section">
+            <h2>健康检查</h2>
+            <button id="healthCheck">检查服务状态</button>
+        </div>
+        
+        <div class="section">
+            <h2>音乐搜索</h2>
+            <input type="text" id="searchQuery" placeholder="输入关键词搜索音乐">
+            <button id="searchMusic">搜索</button>
+        </div>
+        
+        <div class="section">
+            <h2>音乐列表</h2>
+            <button id="getMusicList">获取所有音乐</button>
+        </div>
+        
+        <div class="section">
+            <h2>播放控制</h2>
+            <div id="musicPlayer" style="display: none;">
+                <h3 id="currentTitle">未播放</h3>
+                <audio id="audioPlayer" controls>
+                    您的浏览器不支持音频元素
+                </audio>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>API响应</h2>
+            <div id="response">等待响应...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        
+        // 显示响应
+        function showResponse(data) {
+            document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+        }
+        
+        // 健康检查
+        document.getElementById('healthCheck').addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://localhost:3000/health');
+                const data = await response.json();
+                showResponse(data);
+            } catch (error) {
+                showResponse({ error: error.message });
+            }
+        });
+        
+        // 搜索音乐
+        document.getElementById('searchMusic').addEventListener('click', async () => {
+            const query = document.getElementById('searchQuery').value;
+            try {
+                const response = await fetch(`${API_BASE}/music/search?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                showResponse(data);
+                
+                // 如果有搜索结果，显示播放选项
+                if (data.success && data.results.length > 0) {
+                    const playerDiv = document.getElementById('musicPlayer');
+                    const currentTitle = document.getElementById('currentTitle');
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    
+                    playerDiv.style.display = 'block';
+                    currentTitle.textContent = `${data.results[0].title} - ${data.results[0].artist}`;
+                    audioPlayer.src = `http://localhost:3000/stream/${data.results[0].id}`;
+                }
+            } catch (error) {
+                showResponse({ error: error.message });
+            }
+        });
+        
+        // 获取音乐列表
+        document.getElementById('getMusicList').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_BASE}/music/list`);
+                const data = await response.json();
+                showResponse(data);
+            } catch (error) {
+                showResponse({ error: error.message });
+            }
+        });
+        
+        // 页面加载时自动检查服务状态
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('healthCheck').click();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
