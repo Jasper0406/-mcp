@@ -1,0 +1,85 @@
+// MCP音乐服务平台 - 配置文件示例
+// 复制此文件并重命名为 config.js 以使用自定义配置
+
+const path = require('path');
+
+module.exports = {
+  // 服务器配置
+  server: {
+    host: '0.0.0.0',  // 监听地址，0.0.0.0 表示监听所有网络接口
+    port: 3000        // 监听端口
+  },
+  
+  // 音乐相关配置
+  music: {
+    // 音乐库路径，支持绝对路径或相对路径
+    libraryPath: path.resolve(__dirname, 'music'),
+    
+    // 定期扫描间隔（毫秒），0表示禁用自动扫描
+    scanInterval: 3600000, // 1小时
+    
+    // 支持的音乐格式
+    supportedFormats: ['mp3', 'wav', 'flac', 'm4a', 'aac', 'ogg']
+  },
+  
+  // API配置
+  api: {
+    prefix: '/api',      // API路径前缀
+    timeout: 30000,      // API请求超时时间（毫秒）
+    maxResults: 100      // 搜索结果最大数量
+  },
+  
+  // WebSocket配置
+  websocket: {
+    enabled: true,               // 是否启用WebSocket
+    path: '/ws',                 // WebSocket路径
+    heartbeatInterval: 30000     // 心跳间隔（毫秒）
+  },
+  
+  // CORS配置
+  cors: {
+    origin: '*',  // 允许的源，可以是具体域名如 'http://example.com' 或 '*' 允许所有
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  },
+  
+  // 日志配置
+  logging: {
+    level: 'info',  // 日志级别: error, warn, info, verbose, debug, silly
+    file: path.resolve(__dirname, 'logs/app.log'),
+    maxSize: 5242880, // 5MB
+    maxFiles: 5
+  },
+  
+  // 安全配置
+  security: {
+    enableApiKey: false,  // 是否启用API密钥验证
+    apiKey: 'your_api_key_here',  // API密钥（如果启用）
+    rateLimit: {
+      windowMs: 15 * 60 * 1000,  // 15分钟
+      max: 100  // 每个IP限制请求数
+    }
+  },
+  
+  // 小智AI机器人配置
+  xiaozhi: {
+    enabled: true,  // 是否启用小智集成
+    
+    // 小智WebSocket URL
+    websocketUrl: 'wss://api.xiaozhi.me/mcp',
+    
+    // 身份验证令牌，从IMCP广场或小智AI平台获取
+    token: 'your_token_here',
+    
+    // 重连配置
+    reconnectInterval: 5000,      // 重连间隔（毫秒）
+    maxReconnectAttempts: 5      // 最大重连次数
+  }
+};
+
+// 重要说明：
+// 1. 请确保music.libraryPath指向存在的目录，否则会自动创建
+// 2. xiaozhi.token是必需的，如果不设置，小智集成将无法正常工作
+// 3. 生产环境中建议启用enableApiKey并设置强密码
+// 4. 定期扫描会在后台自动运行，确保音乐库内容保持最新
+// 5. WebSocket用于实时播放状态同步和与小智AI的通信

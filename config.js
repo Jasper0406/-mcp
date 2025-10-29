@@ -15,12 +15,13 @@ module.exports = {
     corsEnabled: true, // 是否启用CORS
   },
   
-  // 小智AI机器人集成配置
+  // 小智AI机器人配置
   xiaozhi: {
-    apiKey: '', // 小智AI机器人API密钥
-    apiEndpoint: '', // 小智AI机器人API端点
-    commandPrefix: '音乐', // 命令前缀
-    websocketUrl: 'wss://api.xiaozhi.me/mcp?token=your token', // 小智AI机器人WebSocket地址
+    enabled: true,
+    websocketUrl: 'wss://api.xiaozhi.me/mcp',
+    token: 'your token',
+    reconnectInterval: 5000,
+    maxReconnectAttempts: 5
   },
   
   // 播放器配置
